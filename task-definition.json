@@ -1,0 +1,23 @@
+{
+  "family": "metrics-collector-task",
+  "containerDefinitions": [
+    {
+      "name": "prometheus",
+      "image": "prom/prometheus:latest",
+      "essential": true,
+      "portMappings": [{ "containerPort": 9090, "hostPort": 9090 }],
+      "mountPoints": [{ "sourceVolume": "prometheus_data", "containerPath": "/etc/prometheus/" }]
+    },
+    {
+      "name": "grafana",
+      "image": "grafana/grafana:latest",
+      "essential": true,
+      "portMappings": [{ "containerPort": 3000, "hostPort": 3000 }],
+      "mountPoints": [{ "sourceVolume": "grafana_data", "containerPath": "/etc/grafana/" }]
+    }
+  ],
+  "volumes": [
+    { "name": "prometheus_data", "host": { "sourcePath": "/var/lib/prometheus/" } },
+    { "name": "grafana_data", "host": { "sourcePath": "/var/lib/grafana/" } }
+  ]
+}
