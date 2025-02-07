@@ -1,0 +1,30 @@
+name: Deploy to ECS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Log in to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+      - name: Build, tag, and push Docker images
+        run: |
+          docker build -t prometheus ./prometheus
+          docker build -t grafana ./grafana
+          docker tag prometheus:latest YOUR_ECR_REPO_URL/prometheus:latest
+          docker tag grafana:latest YOUR_ECR_REPO_URL/grafana:latest
+          docker push YOUR_ECR_REPO_URL/prometheus:latest
+          docker push YOUR_ECR_REPO_URL/grafana:latest
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          service: your-ecs-service
+          cluster: your-ecs-cluster
+          wait-for-service-stability: true
